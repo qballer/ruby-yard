@@ -20,4 +20,8 @@ describe Yard do
   it 'some other test case' do
     expect(Yard.resolve('1 * -1')).to eq(-1)
   end
+
+  it 'should support float' do
+    expect(Yard.resolve('3.0 / 2')).to eq(1.5)
+  end
 end

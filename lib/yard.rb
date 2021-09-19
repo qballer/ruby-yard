@@ -2,46 +2,46 @@
 
 # operator class
 class Operator
-  @@operators = {
+  OPERATORS = {
     '+' => {
-      'precedence' => 2,
-      'operation' => ->(a, b) { a + b }
+      precedence: 2,
+      operation: ->(a, b) { a + b }
     },
     '-' => {
-      'precedence' => 2,
-      'operation' => ->(a, b) { a - b }
+      precedence: 2,
+      operation: ->(a, b) { a - b }
     },
     '*' => {
-      'precedence' => 3,
-      'operation' => ->(a, b) { a * b }
+      precedence: 3,
+      operation: ->(a, b) { a * b }
     },
     '/' => {
-      'precedence' => 3,
-      'operation' => ->(a, b) { a / b }
+      precedence: 3,
+      operation: ->(a, b) { a / b }
     },
     '^' => {
-      'precedence' => 4,
-      'operation' => ->(a, b) { a**b }
+      precedence: 4,
+      operation: ->(a, b) { a**b }
     },
     '(' => {
-      'precedence' => -1
+      precedence: -1
     },
     ')' => {
-      'precedence' => -1
+      precedence: -1
     }
 
   }
 
   def self.token_operator?(op_name)
-    !!(@@operators[op_name])
+    !!(OPERATORS[op_name])
   end
 
   def self.precedence?(op1, op2)
-    @@operators[op1]['precedence'] >= @@operators[op2]['precedence']
+    OPERATORS[op1][:precedence] >= OPERATORS[op2][:precedence]
   end
 
-  def self.do(num1, num2, operator)
-    @@operators[operator]['operation'].call(num2, num1)
+  def self.runOperator(num1, num2, operator)
+    OPERATORS[operator][:operation].call(num2, num1)
   end
 end
 
@@ -77,8 +77,8 @@ class Yard
         if stack.empty? || token == '('
           stack.push(token)
         elsif token == ')'
-          output.push(stack.pop) while !stack.empty? && stack[-1] != '('
-          raise 'expecting opening brace' unless !stack.empty? && stack[-1] == '('
+          output.push(stack.pop) while !stack.empty? && stack.last != '('
+          raise 'expecting opening brace' unless !stack.empty? && stack.last == '('
 
           stack.pop
         else
@@ -100,7 +100,7 @@ class Yard
       elsif Operator.token_operator? token
         num1 = stack.pop.to_f
         num2 = stack.pop.to_f
-        stack.push Operator.do num1, num2, token
+        stack.push Operator.runOperator num1, num2, token
       else
         raise 'unknown operator exception'
       end
@@ -109,6 +109,7 @@ class Yard
   end
 
   def self.string_number?(to_check)
-    to_check.to_i.to_s == to_check
+    # "7".to_f.to_s is not 7.0 it is 7
+    to_check.to_i.to_s == to_check || to_check.to_f.to_s == to_check
   end
 end
